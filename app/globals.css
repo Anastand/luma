@@ -1,10 +1,17 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));  
+
+/* neede to add this here for dark mode toggle to work */
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F2F2F7;
+  --foreground: #1C1C1E;
 }
-
+.dark{
+  --background:#1C1C1E;
+  --foreground:#F2F2F7;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -14,8 +21,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1C1C1E;
+    --foreground: #F2F2F7;
   }
 }
 
