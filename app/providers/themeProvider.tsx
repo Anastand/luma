@@ -9,4 +9,3 @@ export function ThemeProvider({
 }: React.ComponentProps<typeof NextThemesProvider>) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
- // taken form https://ui.shadcn.com/docs/dark-mode/next

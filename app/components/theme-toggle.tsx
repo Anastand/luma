@@ -4,47 +4,53 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const ThemeToggle = () => {
-  const { theme, setTheme } = useTheme();
-  const [systemTheme, setsystemTheme] = useState<"light" | "dark">("light");
+  // resolvedTheme gives us the ACTUAL visual theme ('light' or 'dark')
+  // even if theme is 'system'
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme:dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      setsystemTheme(e.matches ? "dark" : "light");
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = () => {
+      // If user changes OS settings, reset to "system" immediately
+      setTheme("system");
     };
+
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [setTheme]);
+
+  // Hydration fix (mandatory for next-themes)
+  useEffect(() => {
+    setMounted(true);
   }, []);
-  const SWITCH_THEME_BUTTON = () => {
-    console.log(`button clicked`);
-    switch (theme) {
-      case "light":
-        setTheme("dark");
-        return;
-      case "dark":
-        setTheme("light");
-        return;
-      case "system":
-        setTheme(systemTheme == "light" ? "dark" : "light");
-        return;
-      default:
-        return;
+
+  if (!mounted) return null;
+
+  const SWITCH = () => {
+    if (resolvedTheme === "dark") {
+      setTheme("light");
+    } else if (resolvedTheme == "light") {
+      setTheme("dark");
     }
   };
+
   return (
-    <div>
-      <button
-        onClick={SWITCH_THEME_BUTTON}
-        className="size-16 flex items-center justify-center"
-      >
-        <SunIcon
-          size={200}
-          className="rotate-0 scale-100 transition-all duration-200 dark:rotate-90 dark:scale-0 "
-        />{" "}
-        <MoonIcon
-          size={200}
-          className="rotate-90 scale-0 transition-all duration-200 dark:rotate-0 dark:scale-100 "
-        />
-      </button>
-    </div>
+    <button
+      onClick={SWITCH}
+      className="size-16 flex items-center justify-center transition-colors hover:bg-black/5 dark:hover:bg-white/10 rounded-full"
+    >
+      <SunIcon
+        size={32}
+        className="rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0"
+      />
+      <MoonIcon
+        size={32}
+        className="absolute rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100"
+      />
+      <span className="sr-only">Toggle theme</span>
+    </button>
   );
 };
+
+// need to add this to the blog
