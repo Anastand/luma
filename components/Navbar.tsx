@@ -15,18 +15,20 @@ export const Navbar = () => {
   return (
     <div className="border-b border-neutral-200 dark:border-neutral-800">
       <Container className=" flex justify-between py-4">
-        <Logo />
-        <div className="flex items-center gap-4">
-          {Nav_links.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className="text-sm text-neutral-600 dark:text-neutral-400 font-medium"
-            >
-              {" "}
-              {item.title}{" "}
-            </Link>
-          ))}
+        <div className="flex items-center gap-8">
+          <Logo />
+          <div className="flex gap-4">
+            {Nav_links.map((item, index) => (
+              <Link
+                key={index}
+                href={item.href}
+                className="text-sm text-neutral-600 dark:text-neutral-400 font-medium"
+              >
+                {" "}
+                {item.title}{" "}
+              </Link>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <Link
