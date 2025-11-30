@@ -36,11 +36,14 @@
 
 /* 3. LIGHT MODE (Default) */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* --background: oklch(1 0 0); */
+  --background: oklch(96.26% 0.006647434447073504 286.27409787142045);
+  /* --foreground: oklch(0.145 0 0); */
+  --foreground: oklch(22.73% 0.003823376375332139 286.0915771081326);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  /* --popover: oklch(1 0 0); */
+  --popover: oklch(96.26% 0.006647434447073504 286.27409787142045);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
@@ -60,11 +63,16 @@
 
 /* 4. DARK MODE (Must be AFTER :root) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
+  /* --background: oklch(0.145 0 0); */
+  --background: oklch(22.73% 0.003823376375332139 286.0915771081326);
+  /* --foreground: oklch(0.985 0 0); */
+  --foreground: oklch(96.26% 0.006647434447073504 286.27409787142045);
+  /* --card: oklch(0.145 0 0); */
+  --card: oklch(22.73% 0.003823376375332139 286.0915771081326);
+  /* --card-foreground: oklch(0.985 0 0); */
+  --card-foreground: oklch(96.26% 0.006647434447073504 286.27409787142045);
+  /* --popover: oklch(0.145 0 0); */
+  --popover: oklch(22.73% 0.003823376375332139 286.0915771081326);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);

@@ -35,12 +35,7 @@ export const Navbar = () => {
           >
             Login
           </Link>
-          <Button
-            variant={"default"}
-            className="text-sm ext-neutral-600 dark:text-neutral-400 font-medium"
-          >
-            Signup
-          </Button>
+          <Button variant={"default"}>Signup</Button>
           <ModeToggle />
         </div>
       </Container>
