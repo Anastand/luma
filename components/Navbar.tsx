@@ -3,6 +3,7 @@ import { Logo } from "./Logo";
 import { Container } from "./container";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { ModeToggle } from "./theme-toggle";
 
 export const Navbar = () => {
   const Nav_links = [
@@ -40,6 +41,7 @@ export const Navbar = () => {
           >
             Signup
           </Button>
+          <ModeToggle />
         </div>
       </Container>
     </div>
