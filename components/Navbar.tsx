@@ -2,6 +2,7 @@ import React from "react";
 import { Logo } from "./Logo";
 import { Container } from "./container";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 export const Navbar = () => {
   const Nav_links = [
@@ -33,12 +34,12 @@ export const Navbar = () => {
           >
             Login
           </Link>
-          <Link
-            href={"/signUP"}
+          <Button
+            variant={"default"}
             className="text-sm ext-neutral-600 dark:text-neutral-400 font-medium"
           >
             Signup
-          </Link>
+          </Button>
         </div>
       </Container>
     </div>
