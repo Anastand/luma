@@ -3,7 +3,7 @@ import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export const ThemeToggle = () => {
+export const ThemeToggleBTN = () => {
   // resolvedTheme gives us the ACTUAL visual theme ('light' or 'dark')
   // even if theme is 'system'
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -38,7 +38,7 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={SWITCH}
-      className="size-16 flex items-center justify-center transition-colors hover:bg-black/5 dark:hover:bg-white/10 rounded-full"
+      className="size-16 flex items-center justify-center transition-colors hover:bg-black/5 dark:hover:bg-white/10 rounded-full relative"
     >
       <SunIcon
         size={32}
