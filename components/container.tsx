@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../app/lib/utils";
+import { cn } from "../lib/utils";
 // this is the entire code of the container which allow us to put our content in fixed width
 
 export const Container = ({
