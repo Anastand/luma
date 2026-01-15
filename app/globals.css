@@ -91,6 +91,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  color-scheme: light;
 }
 
 /* 4. DARK MODE (Must be AFTER :root) */
@@ -132,6 +133,7 @@
   --sidebar-accent-foreground: oklch(0.28 0.04 193);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
 }
 
 /* 5. Base Styles */

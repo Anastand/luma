@@ -5,7 +5,17 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export function ThemeProvider({
   children,
-  ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  return (
+    <NextThemesProvider
+      // automatically detects the system theme and applies it to the page
+      attribute="class"
+      enableSystem
+      defaultTheme="system"
+      disableTransitionOnChange
+      enableColorScheme
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }
