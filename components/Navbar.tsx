@@ -7,7 +7,7 @@ import { ModeToggle } from "./theme-toggle";
 
 export const Navbar = () => {
   const Nav_links = [
-    { title: "Courses", href: "/courses" },
+    { title: "Courses", href: "/Courses" },
     { title: "Bootcamp", href: "/bootcamp" },
     { title: "create", href: "/create" },
   ];
