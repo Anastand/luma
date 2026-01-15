@@ -3,7 +3,7 @@ import { Logo } from "./Logo";
 import { Container } from "./container";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { ModeToggle } from "./theme-toggle";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export const Navbar = () => {
   const Nav_links = [
@@ -30,15 +30,19 @@ export const Navbar = () => {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Link
-            href={"/login"}
-            className="text-sm ext-neutral-600 dark:text-neutral-400 font-medium"
-          >
-            Login
-          </Link>
-          <Button variant={"default"}>Signup</Button>
-          <ModeToggle />
+        <div className="flex items-center gap-3">
+          <SignedOut>
+            <Link href="/sign-in">
+              <Button variant="ghost">Sign in</Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button>Sign up</Button>
+            </Link>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
       </Container>
     </div>

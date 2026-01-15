@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers/themeProvider";
 import { Navbar } from "../components/Navbar";
-
+import { ClerkProvider } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -27,22 +27,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
-      {/* hydration warning needs to be supressed */}
-      <body
-        suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning className={inter.variable}>
+        {/* hydration warning needs to be supressed */}
+        <body
+          suppressHydrationWarning
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Navbar />
-          <main>{children}</main>
-        </ThemeProvider>
-      </body>
-    </html>
+          <ThemeProvider>
+            <Navbar />
+            <main>{children}</main>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
