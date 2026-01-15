@@ -1,23 +1,21 @@
+// app/api/set-role/route.ts
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 export async function POST(req: Request) {
   const user = await currentUser();
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const { role } = await req.json();
+  const formData = await req.formData();
+  const role = formData.get("role")?.toString() || (await req.json()).role;
+
   if (!["STUDENT", "INSTRUCTOR"].includes(role)) {
-    return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    return new Response("Invalid role", { status: 400 });
   }
 
-
   await (await clerkClient()).users.updateUser(user.id, {
-    publicMetadata: {
-      ...user.publicMetadata,
-      role,
-    },
+    publicMetadata: { ...user.publicMetadata, role },
   });
 
-  return NextResponse.json({ success: true });
+  redirect("/Courses");
 }

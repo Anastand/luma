@@ -1,56 +1,55 @@
-"use client";
-
-import { useUser } from "@clerk/nextjs";
-import { redirect, useRouter } from "next/navigation";
+// app/onboarding/page.tsx
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 
-export default function Onboarding() {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
+export default async function Onboarding() {
+  const user = await currentUser();
 
-  if (!isLoaded) return <div className="p-8">Loading...</div>;
-  if (!user) redirect("/sign-in");
+  if (!user) {
+    redirect("/sign-in");
+  }
 
-  const setRole = async (role: "STUDENT" | "INSTRUCTOR") => {
-    try {
-      await fetch("/api/set-role", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-      await user?.reload();
-      router.push("/Courses"); // or /dashboard later
-    } catch (err) {
-      console.error(err);
-      alert("Failed to set role");
-    }
-  };
+  const role = user.publicMetadata.role as string | undefined;
 
+  if (role) {
+    redirect("/Courses"); // already has role → skip onboarding
+  }
+
+  // If we reach here → logged in, but no role yet → show picker
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Choose your role</CardTitle>
-          <CardDescription>This sets what you can do on LUMA</CardDescription>
+          <CardDescription>This cannot be changed later.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Button size="lg" onClick={() => setRole("STUDENT")}>
-            Student — I want to learn & buy courses
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={() => setRole("INSTRUCTOR")}
-          >
-            Instructor — I want to create & sell courses
-          </Button>
+          <form action="/api/set-role" method="POST">
+            <input type="hidden" name="role" value="STUDENT" />
+            <Button type="submit" size="lg" className="w-full">
+              Student — I want to learn & buy courses
+            </Button>
+          </form>
+
+          <form action="/api/set-role" method="POST">
+            <input type="hidden" name="role" value="INSTRUCTOR" />
+            <Button
+              type="submit"
+              size="lg"
+              variant="outline"
+              className="w-full"
+            >
+              Instructor — I want to create & sell courses
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
