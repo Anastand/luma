@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "./providers/themeProvider";
 import { Navbar } from "../components/Navbar";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +41,6 @@ export default function RootLayout({
         >
           <Navbar />
           <main>{children}</main>
-          {/* {children} */}
         </ThemeProvider>
       </body>
     </html>
