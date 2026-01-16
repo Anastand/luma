@@ -1,38 +1,44 @@
-// This file defines the database structure for the app using Prisma and PostgreSQL.
+// This file is the Prisma schema, defining how Prisma talks to your database.
+// It describes the shape of your data, database tables (as models), and relations between them.
 
-// "generator client" tells Prisma to create a client library for communicating with the database.
-// "datasource db" sets up the connection to a PostgreSQL database.
-
-// The main thing here is the "User" model, which represents users in the system.
-// Each User has:
-//   - "id": a unique identifier (automatically generated UUID).
-//   - "clerkId": a unique ID that comes from Clerk (an authentication provider).
-//   - "role": defines if a user is a STUDENT or INSTRUCTOR (defaults to STUDENT).
-//   - "createdAt": timestamp of when the user was created (set automatically).
-//   - "updatedAt": timestamp of when the user was last updated (set automatically).
-
-// The "Role" enum sets possible user roles in the app (either STUDENT or INSTRUCTOR).
-// This allows the project to differentiate between regular users and teachers.
-
+// "generator client" tells Prisma to generate a TypeScript/JavaScript client for us. 
+// This lets us query our DB in code using Prisma's API.
 generator client {
   provider = "prisma-client-js"
 }
 
+// "datasource db" tells Prisma what kind of database we’re connecting to and will use for migrations/queries.
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // We're using a PostgreSQL database.
 }
 
+// This defines a User model, which becomes a "users" table in Postgres.
 model User {
-  id        String   @id @default(uuid())
-  clerkId   String   @unique
-  email     String   @unique
-  name      String?
-  role      Role     @default(STUDENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String   @id @default(uuid())   // Primary key, auto-generated UUID.
+  clerkId   String   @unique                // Unique Clerk user ID (from Auth system, can't repeat).
+  email     String   @unique                // Email, must be unique for each user.
+  name      String?                         // Optional name field.
+  role      Role     @default(STUDENT)      // Enum field (see below); defaults to STUDENT.
+  courses   Course[] @relation("InstructorCourses") // Connects to Course model. If this user is an instructor, which courses do they teach?
+  createdAt DateTime @default(now())        // Timestamp of user creation, automatically set.
+  updatedAt DateTime @updatedAt             // Timestamp, auto-updated whenever user is changed.
 }
 
+// Enum for user roles. Only values listed here are allowed for User.role.
 enum Role {
   STUDENT
   INSTRUCTOR
+}
+
+// Defines a Course model, which becomes a "courses" table.
+model Course {
+  id           String   @id @default(uuid())   // Primary key, auto-generated UUID.
+  title        String                          // Name/title of course.
+  description  String?                         // Description text, optional.
+  price        Decimal  @default(0) @db.Decimal(10, 2) // Price (max 10 digits, 2 after decimal), defaults to 0.
+  instructorId String                          // Clerk ID of instructor teaching the course.
+  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [clerkId]) 
+  // Sets up a relation: This course belongs to the User with clerkId = instructorId.
+  createdAt    DateTime @default(now())        // When this course was created.
+  updatedAt    DateTime @updatedAt             // Updates whenever the course changes.
 }
