@@ -1,3 +1,19 @@
+// This file defines the database structure for the app using Prisma and PostgreSQL.
+
+// "generator client" tells Prisma to create a client library for communicating with the database.
+// "datasource db" sets up the connection to a PostgreSQL database.
+
+// The main thing here is the "User" model, which represents users in the system.
+// Each User has:
+//   - "id": a unique identifier (automatically generated UUID).
+//   - "clerkId": a unique ID that comes from Clerk (an authentication provider).
+//   - "role": defines if a user is a STUDENT or INSTRUCTOR (defaults to STUDENT).
+//   - "createdAt": timestamp of when the user was created (set automatically).
+//   - "updatedAt": timestamp of when the user was last updated (set automatically).
+
+// The "Role" enum sets possible user roles in the app (either STUDENT or INSTRUCTOR).
+// This allows the project to differentiate between regular users and teachers.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,40 +22,17 @@ datasource db {
   provider = "postgresql"
 }
 
-model Course {
-  id          String  @id @default(uuid())
-  userId      String
-  title       String
-  description String?
-  imageUrl    String?
-  price       Float?
-  isPublished Boolean @default(false)
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
-  attachments Attachment[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@index([categoryId])
-}
-
-model Category {
-  id      String   @id @default(uuid())
-  name    String   @unique
-  courses Course[]
-}
-
-model Attachment {
-  id       String @id @default(uuid())
-  name     String
-  url      String
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      Role     @default(STUDENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
 
-  @@index([courseId])
+enum Role {
+  STUDENT
+  INSTRUCTOR
 }
