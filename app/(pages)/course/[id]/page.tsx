@@ -5,13 +5,19 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function CoursePage({ params }: { params: { id: string } }) {
+export default async function CoursePage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }>  // next js 16 bs
+}) {
+  const { id } = await params; // ← AWAIT params
+
   const course = await prisma.course.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { instructor: true },
   });
 
-  if (!course) notFound(); // Better 404 handling
+  if (!course) notFound();
 
   const user = await currentUser();
   const isOwner = user?.id === course.instructorId;
