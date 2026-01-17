@@ -1,7 +1,7 @@
 import { ComponentExample } from "@/components/component-example";
 import { Container } from "@/components/container";
 
-export default function page() {
+export default function BootcampPage() {
   return (
     <>
       <Container className="flex flex-col items-center justify-center">
