@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         ) : (
           // If instructor has courses, show them in a grid of cards
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {courses.map((course) => (
+            {courses.map((course:any) => (
               <Card key={course.id}>
                 <CardHeader>
                   {/* Course title */}
