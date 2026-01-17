@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   // NOTE: your route folder is `app/(pages)/Courses`, so the path is `/Courses`
   "/Courses(.*)",
+  "/course(.*)",  // ← ADD THIS LINE
 ]);
 
 export default clerkMiddleware((auth, req) => {
