@@ -10,7 +10,7 @@ import prisma from "@/lib/db/prisma";
 async function createCourse(formData: FormData) {
   "use server";
   const user = await currentUser();
-  
+
   if (!user) redirect("/sign-in");
   if ((user.publicMetadata.role as string) !== "INSTRUCTOR") redirect("/Courses");
 
@@ -31,7 +31,12 @@ async function createCourse(formData: FormData) {
   const price = Number(formData.get("price") || 0);
 
   if (!title) throw new Error("Title required");
+  const MIN_PRICE = 0;
+  const MAX_PRICE = 1000000;
 
+  if (price < MIN_PRICE || price > MAX_PRICE) {
+    throw new Error(`Price must be between $${MIN_PRICE} and $${MAX_PRICE}`);
+  }
   await prisma.course.create({
     data: {
       title,
@@ -62,7 +67,16 @@ export default function CreatePage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="price">Price (USD)</Label>
-            <Input id="price" name="price" type="number" min="0" step="0.01" defaultValue="0" />
+            <Input
+              name="price"
+              id="price"
+              type="number"
+              min="0"
+              max="1000000"
+              step="0.01"
+              defaultValue="0"
+              required
+            />
           </div>
           <Button type="submit" className="w-full">Create</Button>
         </form>
