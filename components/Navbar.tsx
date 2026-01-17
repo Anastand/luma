@@ -10,6 +10,7 @@ export const Navbar = () => {
     { title: "Courses", href: "/Courses" },
     { title: "Bootcamp", href: "/bootcamp" },
     { title: "create", href: "/create" },
+    { title: "Dashboard", href: "/dashboard" },
   ];
 
   return (
