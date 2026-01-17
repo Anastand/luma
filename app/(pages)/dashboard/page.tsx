@@ -1,44 +1,68 @@
+// WTF did we do? 
+//
+// 1. We checked the current user (via Clerk) and redirected to /sign-in if no user found.
+// 2. Determined the user's role from their public metadata.
+// 3. If the user is an INSTRUCTOR, we:
+//      - Loaded all courses from the DB where the instructorId matches the current user's id.
+//      - Converted any Decimal price values to strings for serialization.
+//      - Rendered a list of CourseCards for each course, or a prompt/CTA if they have no courses yet.
+// 4. If the user is *not* an instructor (i.e., a student or some other role), we:
+//      - Showed them a My Learning dashboard indicating their enrolled courses will appear here in future.
+//      - Provided a button to browse all available courses.
+//
+// The logic is:
+//   - Instructors manage their own course listings from this dashboard and can create courses.
+//   - Non-instructors see a placeholder for their learning and can browse courses instead.
+//
+// File implementation below.
+
 import prisma from "@/lib/db/prisma";
 import { Container } from "@/components/container";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CourseCard } from "./course-card";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-// The DashboardPage is the main page shown at "/dashboard".
-// It displays different content depending on whether the user is an INSTRUCTOR or a STUDENT.
 export default async function DashboardPage() {
-  // Get the currently logged in user (returns their Clerk user object)
+  // Get the current user; if not logged in, redirect to sign-in
   const user = await currentUser();
-  // If no user is logged in, redirect to the sign-in page
-  if (!user) redirect('/sign-in');
+  if (!user) redirect("/sign-in");
 
-  // Get the user's role from Clerk user public metadata
+  // Get the user's role from Clerk
   const role = user.publicMetadata.role as string;
 
+  // If user is an instructor, show their courses/dash
   if (role === "INSTRUCTOR") {
-    // =============================
-    // INSTRUCTOR DASHBOARD SECTION
-    // =============================
-
-    // Find all courses where the current user is the instructor
+    // Get this user's courses from DB
     const courses = await prisma.course.findMany({
       where: { instructorId: user.id },
+    });
+
+    // Convert price (Decimal) to string for rendering/serialization
+    // how the f this works: convert each course from DB to a plain JS object where price becomes a string (for UI/serialization)
+    const plainCourses = courses.map((course) => {
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        price: String(course.price), // Decimal price -> string for UI and safety
+        instructorId: course.instructorId,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+      };
     });
 
     return (
       <Container className="py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">My Courses</h1>
-          {/* Button that links to the "create a new course" page */}
           <Link href="/create">
             <Button>+ Create Course</Button>
           </Link>
         </div>
 
-        {courses.length === 0 ? (
-          // If instructor has no courses yet, show a message and a button to create their first course
+        {plainCourses.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">No courses yet.</p>
             <Link href="/create">
@@ -46,31 +70,9 @@ export default async function DashboardPage() {
             </Link>
           </div>
         ) : (
-          // If instructor has courses, show them in a grid of cards
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {courses.map((course:any) => (
-              <Card key={course.id}>
-                <CardHeader>
-                  {/* Course title */}
-                  <CardTitle>{course.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {/* Course price and description */}
-                  <p className="text-lg font-bold mb-2">${course.price.toString()}</p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {course.description || "No description"}
-                  </p>
-                  <div className="flex gap-2">
-                    {/* Buttons: View, Edit, Delete 
-                        ('Edit' and 'Delete' are placeholders for now) */}
-                    <Link href={`/course/${course.id}`} className="flex-1">
-                      <Button variant="outline" className="w-full">View</Button>
-                    </Link>
-                    <Button variant="outline">Edit</Button>
-                    <Button variant="destructive">Delete</Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {plainCourses.map((course) => (
+              <CourseCard key={course.id} course={course} userId={user.id} />
             ))}
           </div>
         )}
@@ -78,19 +80,13 @@ export default async function DashboardPage() {
     );
   }
 
-  // =========================
-  // STUDENT DASHBOARD SECTION
-  // =========================
-  // For users with any other role (or no role): 
-  // Only a placeholder, actual enrolled courses listing to be implemented later.
+  // For students/other users, show a learning placeholder and a browse link
   return (
     <Container className="py-12">
       <h1 className="text-3xl font-bold mb-8">My Learning</h1>
       <p className="text-muted-foreground">
-        {/* This message informs students that the "enrolled courses" feature is not yet available */}
         Your enrolled courses will appear here (coming soon).
       </p>
-      {/* Button for students to browse all available courses */}
       <Link href="/Courses" className="mt-4 block">
         <Button>Browse Courses</Button>
       </Link>
