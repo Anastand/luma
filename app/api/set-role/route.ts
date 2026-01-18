@@ -12,6 +12,7 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/db/prisma";
 import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 // This function runs when a POST request is sent to this API endpoint
 export async function POST(req: Request) {
@@ -59,5 +60,6 @@ export async function POST(req: Request) {
   });
 
   // 7. Respond that the change was successful
-  return NextResponse.json({ success: true });
+  console.log(NextResponse.json({ success: true }));
+  redirect('/Courses')
 }
