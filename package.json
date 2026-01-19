@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "prisma generate",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
+  "postinstall": "prisma generate && prisma db push --skip-generate",
+  "build": "next build",
+  "dev": "next dev",
+  "lint": "eslint"
+},
   "dependencies": {
     "@base-ui/react": "^1.0.0",
     "@clerk/nextjs": "^6.36.7",
