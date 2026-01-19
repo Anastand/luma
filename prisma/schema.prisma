@@ -1,44 +1,109 @@
-// This file is the Prisma schema, defining how Prisma talks to your database.
-// It describes the shape of your data, database tables (as models), and relations between them.
+// ===================================================================
+// LUMA DATABASE SCHEMA - RELATIONSHIP GUIDE
+// ===================================================================
+//
+// CLERK INTEGRATION:
+// - When a user signs up via Clerk, they get a clerkId (e.g., "user_abc123xyz")
+// - We store this clerkId as User.clerkId @unique (not auto-generated UUID)
+// - This creates a direct link between Clerk auth and our database
+//
+// USER HIERARCHY:
+// User (clerkId) → many Courses
+//   └─ Course (instructorId = User.clerkId) → many Chapters
+//       └─ Chapter → many Lessons
+//
+// HOW IT WORKS:
+// 1. Instructor picks role → Prisma User record created with clerkId + role
+// 2. Instructor creates course → stores instructorId = currentUser().id (Clerk ID)
+// 3. Query courses → WHERE instructorId = user.id (Clerk ID)
+// 4. Get chapters/lessons → JOIN Course → JOIN Chapter → JOIN Lesson
+//
+// EXAMPLE:
+// currentUser() from Clerk → { id: "user_abc123xyz" }
+// prisma.course.create({ instructorId: user.id })
+// → Course { instructorId: "user_abc123xyz" }
+// prisma.course.findMany({ where: { instructorId: user.id } })
+// → Returns all courses for this instructor
+//
+// CASCADE DELETE:
+// - If Course is deleted → all Chapters deleted
+// - If Chapter is deleted → all Lessons deleted
+// - Keeps DB clean, no orphaned records
+//
+// ===================================================================
 
-// "generator client" tells Prisma to generate a TypeScript/JavaScript client for us. 
-// This lets us query our DB in code using Prisma's API.
+// This Prisma schema defines the models and their relationships for the e-learning app.
+// Generator and datasource: sets up Prisma to use the PostgreSQL database.
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // Generate a TypeScript client
 }
 
-// "datasource db" tells Prisma what kind of database we’re connecting to and will use for migrations/queries.
 datasource db {
-  provider = "postgresql" // We're using a PostgreSQL database.
+  provider = "postgresql" // Use PostgreSQL as the database
 }
 
-// This defines a User model, which becomes a "users" table in Postgres.
+// User: represents students and instructors.
 model User {
-  id        String   @id @default(uuid())   // Primary key, auto-generated UUID.
-  clerkId   String   @unique                // Unique Clerk user ID (from Auth system, can't repeat).
-  email     String   @unique                // Email, must be unique for each user.
-  name      String?                         // Optional name field.
-  role      Role     @default(STUDENT)      // Enum field (see below); defaults to STUDENT.
-  courses   Course[] @relation("InstructorCourses") // Connects to Course model. If this user is an instructor, which courses do they teach?
-  createdAt DateTime @default(now())        // Timestamp of user creation, automatically set.
-  updatedAt DateTime @updatedAt             // Timestamp, auto-updated whenever user is changed.
+  id        String   @id @default(uuid()) // Unique user ID (UUID)
+  clerkId   String   @unique // Auth provider ID, unique for each user
+  email     String   @unique // User's email, must be unique
+  name      String? // Optional display name
+  role      Role     @default(STUDENT) // User's role, either STUDENT or INSTRUCTOR
+  courses   Course[] @relation("InstructorCourses") // All Courses this user teaches; one-to-many (User-Instructor → Courses)
+  createdAt DateTime @default(now()) // When this user was created
+  updatedAt DateTime @updatedAt // When this user was last updated
 }
 
-// Enum for user roles. Only values listed here are allowed for User.role.
+// Role enum: restricts possible values for a user's role.
 enum Role {
-  STUDENT
-  INSTRUCTOR
+  STUDENT // Can view and enroll in courses
+  INSTRUCTOR // Can create and teach courses
 }
 
-// Defines a Course model, which becomes a "courses" table.
+// Course: represents a course taught by an instructor.
 model Course {
-  id           String   @id @default(uuid())   // Primary key, auto-generated UUID.
-  title        String                          // Name/title of course.
-  description  String?                         // Description text, optional.
-  price        Decimal  @default(0) @db.Decimal(10, 2) // Price (max 10 digits, 2 after decimal), defaults to 0.
-  instructorId String                          // Clerk ID of instructor teaching the course.
-  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [clerkId]) 
-  // Sets up a relation: This course belongs to the User with clerkId = instructorId.
-  createdAt    DateTime @default(now())        // When this course was created.
-  updatedAt    DateTime @updatedAt             // Updates whenever the course changes.
+  id           String    @id @default(uuid()) // Unique course ID (UUID)
+  title        String // Course title
+  description  String? // Optional course description
+  price        Decimal   @default(0) @db.Decimal(10, 2) // Price (decimal, two decimal places)
+  thumbnailUrl String? // Optional course image
+  instructorId String // References User.clerkId, identifies teacher
+  instructor   User      @relation("InstructorCourses", fields: [instructorId], references: [clerkId])
+  // Each Course must have one instructor (User). Many courses can point to the same User as instructor (many-to-one).
+  chapters     Chapter[] // Chapters that are part of this Course (one-to-many)
+  createdAt    DateTime  @default(now()) // When the course was created
+  updatedAt    DateTime  @updatedAt // When the course was last updated
 }
+
+// Chapter: a section of a course that contains lessons.
+model Chapter {
+  id        String   @id @default(uuid()) // Unique chapter ID (UUID)
+  title     String // Chapter title
+  order     Int // Chapter order in the course
+  courseId  String // References Course.id, which course this chapter belongs to
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // Each Chapter must belong to one Course (many chapters per course). If the Course is deleted, delete related Chapters (cascade).
+  lessons   Lesson[] // Lessons within this Chapter (one-to-many)
+  createdAt DateTime @default(now()) // When the chapter was created
+  updatedAt DateTime @updatedAt // When the chapter was last updated
+}
+
+// Lesson: the smallest content unit, part of a chapter.
+model Lesson {
+  id             String   @id @default(uuid()) // Unique lesson ID (UUID)
+  title          String // Lesson title
+  description    String? // Optional lesson description
+  youtubeVideoId String? // Optional YouTube video for this lesson
+  order          Int // Lesson order within the chapter
+  chapterId      String // References Chapter.id (which chapter is this lesson in)
+  chapter        Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  // Every Lesson belongs to one Chapter (many lessons per chapter). If the Chapter is deleted, delete its Lessons (cascade).
+  createdAt      DateTime @default(now()) // When the lesson was created
+  updatedAt      DateTime @updatedAt // When the lesson was last updated
+}
+
+// Relations summary:
+// - User (as Instructor) ↔ Course: One instructor can create many courses, a Course is taught by one instructor.
+// - Course ↔ Chapter: One course consists of many chapters, each chapter belongs to one course.
+// - Chapter ↔ Lesson: One chapter contains multiple lessons, each lesson is part of a chapter.
+// - Cascade delete: Deleting a course deletes its chapters, deleting chapters deletes their lessons.
