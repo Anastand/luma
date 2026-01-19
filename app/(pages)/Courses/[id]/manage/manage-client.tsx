@@ -98,16 +98,16 @@ export function ManageChaptersClient({
 
   // SUBMIT COURSE FORM — Edit title, description, price etc. Validate first, then call the server action
   const handleUpdateCourse = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevents page reload
+    e.preventDefault();
     startTransition(async () => {
       try {
-        // Validation should be done in the backend action too (defensive!), this just sends data to action
         await updateCourse(course.id, userId, {
           title: course.title,
           description: course.description,
           price: parseFloat(course.price),
         });
-        router.refresh(); // Refreshes the page state after successful update
+        alert("Course saved successfully!");
+        router.push("/dashboard"); // Redirect to dashboard (fresh data)
       } catch (error) {
         alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -123,9 +123,11 @@ export function ManageChaptersClient({
     startTransition(async () => {
       try {
         await createChapter(course.id, userId, newChapterTitle);
+        alert("Chapter added!");
+        router.refresh(); // Reload this page with new chapters
         setNewChapterTitle("");
         setAddingChapter(false);
-        router.refresh(); // Get the fresh data after update
+        window.location.reload(); // Hard reload page = fresh server render
       } catch (error) {
         alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -158,15 +160,15 @@ export function ManageChaptersClient({
           youtubeVideoId: newLesson.youtubeVideoId,
           description: newLesson.description || null,
         });
+        alert("Lesson added!");
         setNewLesson({ title: "", youtubeVideoId: "", description: "" });
         setAddingLessonTo(null);
-        router.refresh();
+        window.location.reload(); // Hard reload = fresh data
       } catch (error) {
         alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };
-
   // Delete a lesson (shows confirmation dialog)
   const handleDeleteLesson = async (lessonId: string) => {
     if (!confirm("Delete this lesson?")) return;

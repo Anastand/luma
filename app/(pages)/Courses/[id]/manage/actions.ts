@@ -8,22 +8,30 @@ export async function updateCourse(
   userId: string,
   data: { title: string; description: string | null; price: number }
 ) {
-  // Find course by ID
+  console.log("=== updateCourse called ===");
+  console.log("courseId:", courseId);
+  console.log("userId:", userId);
+  console.log("data:", data);
+
   const course = await prisma.course.findUnique({
     where: { id: courseId },
   });
 
-  // Check ownership
+  console.log("Course found:", course);
+  console.log("course.instructorId:", course?.instructorId);
+  console.log("userId match?", course?.instructorId === userId);
+
   if (!course || course.instructorId !== userId) {
+    console.log("Authorization FAILED");
     throw new Error("Unauthorized");
   }
-  // Validate data
+
   if (!data.title?.trim()) throw new Error("Title required");
   if (data.price < 0 || data.price > 1000000) {
     throw new Error("Price must be between 0 and 1,000,000");
   }
 
-  // Update course details
+  console.log("About to update course...");
   await prisma.course.update({
     where: { id: courseId },
     data: {
@@ -32,6 +40,8 @@ export async function updateCourse(
       price: data.price,
     },
   });
+
+  console.log("Course updated successfully");
 }
 
 // ===== CHAPTER ACTIONS =====
@@ -204,3 +214,4 @@ export async function deleteLesson(lessonId: string, userId: string) {
     where: { id: lessonId },
   });
 }
+
