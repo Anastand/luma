@@ -10,15 +10,7 @@ export function CourseCard({
   course,
   userId,
 }: {
-  course: {
-    id: string;
-    title: string;
-    description: string | null;
-    price: string;  // ← Now string, not Decimal
-    instructorId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  course: any;
   userId: string;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -35,22 +27,25 @@ export function CourseCard({
         <CardTitle>{course.title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-lg font-bold mb-2">${course.price}</p>
+        <p className="text-lg font-bold mb-2">${course.price.toString()}</p>
         <p className="text-sm text-muted-foreground mb-4">
           {course.description || "No description"}
         </p>
 
         <div className="flex gap-2">
+          {/* View button */}
           <Link href={`/course/${course.id}`} className="flex-1">
             <Button variant="outline" className="w-full">
               View
             </Button>
           </Link>
 
-          <Link href={`/dashboard/${course.id}/edit`}>
-            <Button variant="outline">Edit</Button>
+          {/* MANAGE button (NEW) */}
+          <Link href={`/Courses/${course.id}/manage`}>
+            <Button variant="outline">Manage</Button>
           </Link>
 
+          {/* Delete button */}
           <Button
             variant="destructive"
             onClick={handleDelete}
