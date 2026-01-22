@@ -31,7 +31,7 @@ export default async function DashboardPage() {
 
   // Get the user's role from Clerk
   const role = user.publicMetadata.role as string;
-
+  
   // If user is an instructor, show their courses/dash
   if (role === "INSTRUCTOR") {
     // Get this user's courses from DB

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/db/prisma";
+import { stripe } from "@/lib/stripe";
 
 async function createCourse(formData: FormData) {
   "use server";
@@ -14,7 +15,7 @@ async function createCourse(formData: FormData) {
   if (!user) redirect("/sign-in");
   if ((user.publicMetadata.role as string) !== "INSTRUCTOR") redirect("/Courses");
 
-  // ✅ UPSERT user first - ensures clerkId exists in User table
+  // ✅ UPSERT user first
   await prisma.user.upsert({
     where: { clerkId: user.id },
     update: { role: "INSTRUCTOR" },
@@ -37,16 +38,51 @@ async function createCourse(formData: FormData) {
   if (price < MIN_PRICE || price > MAX_PRICE) {
     throw new Error(`Price must be between $${MIN_PRICE} and $${MAX_PRICE}`);
   }
+
+  // 🔴 NEW: Create Stripe product + price (only if paid course)
+  let stripeProductId: string | null = null;
+  let stripePriceId: string | null = null;
+
+  if (price > 0) {
+    try {
+      // Create product in Stripe
+      const stripeProduct = await stripe.products.create({
+        name: title,
+        description: description || undefined,
+        metadata: {
+          internal_id: "temp", // Will keep track of course
+        },
+      });
+
+      stripeProductId = stripeProduct.id;
+
+      // Create price for product
+      const stripePrice = await stripe.prices.create({
+        product: stripeProduct.id,
+        unit_amount: Math.round(price * 100), // Convert dollars to cents
+        currency: 'usd',
+      });
+
+      stripePriceId = stripePrice.id;
+    } catch (error) {
+      console.error('Stripe error:', error);
+      throw new Error('Failed to create Stripe product');
+    }
+  }
+
+  // Create course with Stripe IDs
   await prisma.course.create({
     data: {
       title,
       description,
       price,
       instructorId: user.id,
+      stripeProductId,
+      stripePriceId,
     },
   });
 
-  redirect("/Courses");
+  redirect("/dashboard");
 }
 
 export default function CreatePage() {
