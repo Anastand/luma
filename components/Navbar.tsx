@@ -8,8 +8,8 @@ import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 export const Navbar = () => {
   const Nav_links = [
     { title: "Courses", href: "/Courses" },
-    { title: "Bootcamp", href: "/bootcamp" },
-    { title: "create", href: "/create" },
+    // { title: "Bootcamp", href: "/bootcamp" },
+    // { title: "create", href: "/create" },
     { title: "Dashboard", href: "/dashboard" },
   ];
 

@@ -44,14 +44,15 @@ datasource db {
 
 // User: represents students and instructors.
 model User {
-  id        String   @id @default(uuid()) // Unique user ID (UUID)
-  clerkId   String   @unique // Auth provider ID, unique for each user
-  email     String   @unique // User's email, must be unique
-  name      String? // Optional display name
-  role      Role     @default(STUDENT) // User's role, either STUDENT or INSTRUCTOR
-  courses   Course[] @relation("InstructorCourses") // All Courses this user teaches; one-to-many (User-Instructor → Courses)
-  createdAt DateTime @default(now()) // When this user was created
-  updatedAt DateTime @updatedAt // When this user was last updated
+  id          String       @id @default(uuid()) // Unique user ID (UUID)
+  clerkId     String       @unique // Auth provider ID, unique for each user
+  email       String       @unique // User's email, must be unique
+  name        String? // Optional display name
+  role        Role         @default(STUDENT) // User's role, either STUDENT or INSTRUCTOR
+  courses     Course[]     @relation("InstructorCourses") // All Courses this user teaches; one-to-many (User-Instructor → Courses)
+  createdAt   DateTime     @default(now()) // When this user was created
+  updatedAt   DateTime     @updatedAt // When this user was last updated
+  enrollments Enrollment[]
 }
 
 // Role enum: restricts possible values for a user's role.
@@ -62,17 +63,20 @@ enum Role {
 
 // Course: represents a course taught by an instructor.
 model Course {
-  id           String    @id @default(uuid()) // Unique course ID (UUID)
-  title        String // Course title
-  description  String? // Optional course description
-  price        Decimal   @default(0) @db.Decimal(10, 2) // Price (decimal, two decimal places)
-  thumbnailUrl String? // Optional course image
-  instructorId String // References User.clerkId, identifies teacher
-  instructor   User      @relation("InstructorCourses", fields: [instructorId], references: [clerkId])
+  id              String       @id @default(uuid()) // Unique course ID (UUID)
+  title           String // Course title
+  description     String? // Optional course description
+  price           Decimal      @default(0) @db.Decimal(10, 2) // Price (decimal, two decimal places)
+  thumbnailUrl    String? // Optional course image
+  instructorId    String // References User.clerkId, identifies teacher
+  instructor      User         @relation("InstructorCourses", fields: [instructorId], references: [clerkId])
   // Each Course must have one instructor (User). Many courses can point to the same User as instructor (many-to-one).
-  chapters     Chapter[] // Chapters that are part of this Course (one-to-many)
-  createdAt    DateTime  @default(now()) // When the course was created
-  updatedAt    DateTime  @updatedAt // When the course was last updated
+  chapters        Chapter[] // Chapters that are part of this Course (one-to-many)
+  createdAt       DateTime     @default(now()) // When the course was created
+  updatedAt       DateTime     @updatedAt // When the course was last updated
+  enrollments     Enrollment[]
+  stripeProductId String?
+  stripePriceId   String?
 }
 
 // Chapter: a section of a course that contains lessons.
@@ -107,3 +111,14 @@ model Lesson {
 // - Course ↔ Chapter: One course consists of many chapters, each chapter belongs to one course.
 // - Chapter ↔ Lesson: One chapter contains multiple lessons, each lesson is part of a chapter.
 // - Cascade delete: Deleting a course deletes its chapters, deleting chapters deletes their lessons.
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  user      User     @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}

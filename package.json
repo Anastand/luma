@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "postinstall": "prisma generate",
-  "build": "next build",
-  "dev": "next dev",
-  "lint": "eslint"
-},
+    "postinstall": "prisma generate",
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "eslint",
+    "flush":"rm -rf .next node_modules/.prisma && pnpm prisma generate"
+  },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
     "@clerk/nextjs": "^6.36.7",
@@ -25,6 +26,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "shadcn": "^3.6.3",
+    "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7"
   },
