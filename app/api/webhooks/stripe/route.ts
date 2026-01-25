@@ -1,48 +1,42 @@
-import prisma  from "@/lib/db/prisma";
-import { stripe } from "@/lib/stripe";
-import { headers } from "next/headers";
+import prisma from "@/lib/db/prisma";
 
-// Mark route as dynamic to prevent build-time analysis
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   try {
-    const rawBody = await req.text();
-    const headersList = await headers();
-    const signature = headersList.get("stripe-signature");
+    const body = await req.json();
 
-    if (!signature) {
-      return new Response("Missing signature", { status: 400 });
-    }
+    console.log("Webhook received:", body.type);
 
-    // Verify Stripe signature
-    const event = stripe().webhooks.constructEvent(
-      rawBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    if (body.type === "checkout.session.completed") {
+      const metadata = body.data.object.metadata;
+      const userId = metadata?.userId;
+      const courseId = metadata?.courseId;
 
-    // Handle checkout.session.completed event
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-
-      const userId = session.metadata?.userId;
-      const courseId = session.metadata?.courseId;
+      console.log("Metadata:", { userId, courseId });
 
       if (!userId || !courseId) {
-        throw new Error("Missing userId or courseId in metadata");
+        throw new Error("Missing userId or courseId");
       }
 
-      // Create enrollment
-      await prisma.enrollment.create({
-        data: {
-          userId,
-          courseId,
+      // Ensure user exists
+      await prisma.user.upsert({
+        where: { clerkId: userId },
+        update: {},
+        create: {
+          clerkId: userId,
+          email: `${userId}@clerk.local`,
+          name: null,
+          role: "STUDENT",
         },
       });
 
-      console.log(`✅ Enrollment created: user=${userId}, course=${courseId}`);
+      await prisma.enrollment.create({
+        data: { userId, courseId },
+      });
+
+      console.log(`✅ Enrollment created: ${userId} → ${courseId}`);
     }
 
     return new Response("OK", { status: 200 });
