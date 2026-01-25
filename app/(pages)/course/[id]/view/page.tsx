@@ -27,5 +27,11 @@ export default async function viewcourse({ params }: { params: Promise<{ id: str
 
   if (!isInstructor && !isEnrolled) redirect("/Courses")
 
-  return <StudentView course={courseData} />
+  // Convert Decimal to string for client component serialization
+  const serializedCourse = {
+    ...courseData,
+    price: courseData.price.toString(),
+  }
+
+  return <StudentView course={serializedCourse} />
 }

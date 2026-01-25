@@ -15,7 +15,12 @@ type CourseWithChaptersAndLessons = Prisma.CourseGetPayload<{
   }
 }>
 
-export function StudentView({ course }: { course: CourseWithChaptersAndLessons }) {
+// Serialized version with price as string instead of Decimal
+type SerializedCourse = Omit<CourseWithChaptersAndLessons, 'price'> & {
+  price: string
+}
+
+export function StudentView({ course }: { course: SerializedCourse }) {
   const [expandedChapters, setExpandedChapters] = useState<string[]>([
     course.chapters[0]?.id || ""
   ])

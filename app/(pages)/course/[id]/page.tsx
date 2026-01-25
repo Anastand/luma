@@ -53,10 +53,14 @@ export default async function CoursePage({
         <p className="text-3xl font-bold">${course.price.toString()}</p>
 
         {isOwner ? (
-          <p className="text-sm text-green-600 mt-4">✓ You own this course</p>
+          <Link href={`/course/${id}/view`}>
+            <Button className="mt-4 w-full">View Course</Button>
+          </Link>
         ) : user ? (
           isEnrolled ? (
-            <Button disabled className="mt-4 w-full">✓ Enrolled</Button>
+            <Link href={`/course/${id}/view`}>
+              <Button className="mt-4 w-full">View Course</Button>
+            </Link>
           ) : (
             <CheckoutButton courseId={id} price={course.price.toString()} />  // ← CHANGE: use id, not params.id
           )
