@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function CoursesPage() {
-  const courses = await prisma.course.findMany({
-    include: { instructor: { select: { name: true, email: true } } },
-  });
+  const courses = await prisma.course.findMany();
 
   return (
     <Container className="py-6 sm:py-12">
@@ -16,7 +14,7 @@ export default async function CoursesPage() {
         <p className="text-muted-foreground">No courses yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {courses.map((course:any) => (
+          {courses.map((course) => (
             <Card key={course.id}>
               <CardHeader>
                 <CardTitle>{course.title}</CardTitle>
@@ -24,7 +22,6 @@ export default async function CoursesPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">${course.price.toString()}</p>
-                <p className="text-sm text-muted-foreground">by {course.instructor.name || course.instructor.email}</p>
                 <Link href={`/course/${course.id}`}>
                   <Button className="w-full mt-4">View</Button>
                 </Link>
