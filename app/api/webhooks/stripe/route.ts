@@ -2,6 +2,10 @@ import prisma  from "@/lib/db/prisma";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 
+// Mark route as dynamic to prevent build-time analysis
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
@@ -13,7 +17,7 @@ export async function POST(req: Request) {
     }
 
     // Verify Stripe signature
-    const event = stripe.webhooks.constructEvent(
+    const event = stripe().webhooks.constructEvent(
       rawBody,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!

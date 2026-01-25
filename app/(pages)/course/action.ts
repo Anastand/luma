@@ -58,7 +58,7 @@ export async function createCheckoutSession(courseId: string) {
     throw new Error("Course not set up for payment");
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await stripe().checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
       {

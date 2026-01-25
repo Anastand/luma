@@ -42,7 +42,10 @@ export function CourseCard({
         <div className="flex gap-2">
           {/* View course page */}
           <Link href={`/course/${course.id}`} className="flex-1">
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className={`w-full ${userId !== course.instructorId ? 'bg-green-600' : 'bg-green-600'}`}
+            >
               View
             </Button>
           </Link>

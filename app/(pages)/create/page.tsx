@@ -46,7 +46,7 @@ async function createCourse(formData: FormData) {
   if (price > 0) {
     try {
       // Create product in Stripe
-      const stripeProduct = await stripe.products.create({
+      const stripeProduct = await stripe().products.create({
         name: title,
         description: description || undefined,
         metadata: {
@@ -57,7 +57,7 @@ async function createCourse(formData: FormData) {
       stripeProductId = stripeProduct.id;
 
       // Create price for product
-      const stripePrice = await stripe.prices.create({
+      const stripePrice = await stripe().prices.create({
         product: stripeProduct.id,
         unit_amount: Math.round(price * 100), // Convert dollars to cents
         currency: 'usd',

@@ -31,9 +31,6 @@ export default async function DashboardPage() {
 
   // Get the user's role from Clerk
   const role = user.publicMetadata.role as string;
-  console.log(" detail start here")
-  console.log("Current user:", JSON.stringify(user, null, 2));
-  console.log(" detail end here")
 
 
   // If user is an instructor, show their courses/dash
@@ -94,7 +91,7 @@ export default async function DashboardPage() {
         course: true
       }
     })
-    console.log(userEnrolledCourses)
+
     // Student view - show enrolled courses
     const plainCourses = userEnrolledCourses.map((enrollment) => ({
       id: enrollment.course.id,

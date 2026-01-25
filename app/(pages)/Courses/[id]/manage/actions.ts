@@ -9,17 +9,10 @@ export async function updateCourse(
   data: { title: string; description: string | null; price: number }
 ) {
   console.log("=== updateCourse called ===");
-  console.log("courseId:", courseId);
-  console.log("userId:", userId);
-  console.log("data:", data);
-
   const course = await prisma.course.findUnique({
     where: { id: courseId },
   });
 
-  console.log("Course found:", course);
-  console.log("course.instructorId:", course?.instructorId);
-  console.log("userId match?", course?.instructorId === userId);
 
   if (!course || course.instructorId !== userId) {
     console.log("Authorization FAILED");
