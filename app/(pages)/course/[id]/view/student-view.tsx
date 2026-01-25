@@ -40,15 +40,40 @@ export function StudentView({ course }: { course: SerializedCourse }) {
     .flatMap((ch) => ch.lessons)
     .find((l) => l.id === selectedLessonId)
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   const videoId = selectedLesson?.youtubeVideoId
     ? extractYouTubeId(selectedLesson.youtubeVideoId)
     : null
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex flex-col lg:flex-row h-screen bg-background">
+      {/* Mobile Sidebar Toggle */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-20 left-4 z-50 p-2 bg-card border border-border rounded-lg shadow-lg"
+        aria-label="Toggle sidebar"
+      >
+        {sidebarOpen ? (
+          <ChevronUp className="w-5 h-5" />
+        ) : (
+          <ChevronDown className="w-5 h-5" />
+        )}
+      </button>
+
       {/* Sidebar */}
-      <div className="w-80 border-r border-border bg-card overflow-y-auto">
-        <div className="p-6 border-b border-border">
-          <h2 className="text-xl font-bold">{course.title}</h2>
+      <div className={`
+        fixed lg:static
+        top-[73px] lg:top-0
+        left-0 right-0 lg:right-auto
+        w-full lg:w-80
+        h-[calc(100vh-73px)] lg:h-screen
+        border-r border-border bg-card overflow-y-auto
+        z-40
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}
+      `}>
+        <div className="p-4 lg:p-6 border-b border-border">
+          <h2 className="text-lg lg:text-xl font-bold">{course.title}</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {course.chapters.length} chapters
           </p>
@@ -74,7 +99,10 @@ export function StudentView({ course }: { course: SerializedCourse }) {
                   {chapter.lessons.map((lesson) => (
                     <button
                       key={lesson.id}
-                      onClick={() => setSelectedLessonId(lesson.id)}
+                      onClick={() => {
+                        setSelectedLessonId(lesson.id)
+                        setSidebarOpen(false) // Close sidebar on mobile after selecting
+                      }}
                       className={`w-full text-left p-2 rounded text-sm ${selectedLessonId === lesson.id
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-accent"
@@ -91,19 +119,18 @@ export function StudentView({ course }: { course: SerializedCourse }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="border-b border-border p-6">
-          <h1 className="text-2xl font-bold">{selectedLesson?.title}</h1>
-          <p className="text-muted-foreground mt-2">{selectedLesson?.description}</p>
+        <div className="border-b border-border p-4 lg:p-6">
+          <h1 className="text-xl lg:text-2xl font-bold">{selectedLesson?.title}</h1>
+          <p className="text-muted-foreground mt-2 text-sm lg:text-base">{selectedLesson?.description}</p>
         </div>
 
         {/* Content */}
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-3 gap-6">
-            {/* Video Player - 2/3 width */}
-            <div className="col-span-2">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+            {/* Video Player */}
+            <div className="lg:col-span-2">
               {videoId ? (
                 <div className="aspect-video rounded-lg overflow-hidden bg-black mb-4">
                   <iframe
@@ -113,6 +140,7 @@ export function StudentView({ course }: { course: SerializedCourse }) {
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    className="w-full h-full"
                   />
                 </div>
               ) : (
@@ -122,12 +150,16 @@ export function StudentView({ course }: { course: SerializedCourse }) {
               )}
             </div>
 
-            {/* Description - 1/3 width */}
-            <div className="col-span-1 bg-card rounded-lg p-4 border border-border">
+            {/* Description */}
+            <div className="lg:col-span-1 bg-card rounded-lg p-4 border border-border">
               <h3 className="font-semibold mb-3">About this lesson</h3>
               <p className="text-sm text-muted-foreground">
                 {selectedLesson?.description || "No description available"}
-                {selectedLesson?.youtubeVideoId && `    https://www.youtube.com/embed/${selectedLesson.youtubeVideoId}`}
+                {selectedLesson?.youtubeVideoId && (
+                  <span className="block mt-2 text-xs break-all">
+                    {selectedLesson.youtubeVideoId}
+                  </span>
+                )}
               </p>
             </div>
           </div>

@@ -87,10 +87,10 @@ async function createCourse(formData: FormData) {
 
 export default function CreatePage() {
   return (
-    <Container className="flex flex-col items-center justify-center min-h-screen py-12">
-      <div className="w-full max-w-md space-y-8">
+    <Container className="flex flex-col items-center justify-center min-h-screen py-8 sm:py-12">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Create Course</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Create Course</h2>
         </div>
         <form action={createCourse} className="space-y-4">
           <div className="space-y-2">

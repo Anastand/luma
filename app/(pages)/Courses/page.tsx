@@ -10,8 +10,8 @@ export default async function CoursesPage() {
   });
 
   return (
-    <Container className="py-12">
-      <h1 className="text-3xl font-bold mb-8">All Courses</h1>
+    <Container className="py-6 sm:py-12">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">All Courses</h1>
       {courses.length === 0 ? (
         <p className="text-muted-foreground">No courses yet.</p>
       ) : (

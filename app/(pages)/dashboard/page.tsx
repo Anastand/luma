@@ -59,10 +59,10 @@ export default async function DashboardPage() {
 
     return (
       <Container className="py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">My Courses</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold">My Courses</h1>
           <Link href="/create">
-            <Button>+ Create Course</Button>
+            <Button className="w-full sm:w-auto">+ Create Course</Button>
           </Link>
         </div>
 
@@ -105,10 +105,10 @@ export default async function DashboardPage() {
 
     return (
       <Container className="py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">My Learning</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold">My Learning</h1>
           <Link href="/Courses">
-            <Button variant="outline">Browse More Courses</Button>
+            <Button variant="outline" className="w-full sm:w-auto">Browse More Courses</Button>
           </Link>
         </div>
 
