@@ -46,7 +46,6 @@ datasource db {
 model User {
   id          String       @id @default(uuid()) // Unique user ID (UUID)
   clerkId     String       @unique // Auth provider ID, unique for each user
-  email       String       @unique // User's email, must be unique
   name        String? // Optional display name
   role        Role         @default(STUDENT) // User's role, either STUDENT or INSTRUCTOR
   courses     Course[]     @relation("InstructorCourses") // All Courses this user teaches; one-to-many (User-Instructor → Courses)
