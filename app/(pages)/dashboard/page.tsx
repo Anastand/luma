@@ -31,7 +31,11 @@ export default async function DashboardPage() {
 
   // Get the user's role from Clerk
   const role = user.publicMetadata.role as string;
-  
+  console.log(" detail start here")
+  console.log("Current user:", JSON.stringify(user, null, 2));
+  console.log(" detail end here")
+
+
   // If user is an instructor, show their courses/dash
   if (role === "INSTRUCTOR") {
     // Get this user's courses from DB
@@ -39,6 +43,8 @@ export default async function DashboardPage() {
       where: { instructorId: user.id },
     });
 
+
+    // console.log(userEnrolledCourses)
     // Convert price (Decimal) to string for rendering/serialization
     // how the f this works: convert each course from DB to a plain JS object where price becomes a string (for UI/serialization)
     const plainCourses = courses.map((course) => {
@@ -52,6 +58,7 @@ export default async function DashboardPage() {
         updatedAt: course.updatedAt,
       };
     });
+
 
     return (
       <Container className="py-12">
@@ -80,16 +87,49 @@ export default async function DashboardPage() {
     );
   }
 
-  // For students/other users, show a learning placeholder and a browse link
-  return (
-    <Container className="py-12">
-      <h1 className="text-3xl font-bold mb-8">My Learning</h1>
-      <p className="text-muted-foreground">
-        Your enrolled courses will appear here (coming soon).
-      </p>
-      <Link href="/Courses" className="mt-4 block">
-        <Button>Browse Courses</Button>
-      </Link>
-    </Container>
-  );
+  if (role != "INSTRUCTOR") {
+    const userEnrolledCourses = await prisma.enrollment.findMany({
+      where: { userId: user.id },
+      include: {
+        course: true
+      }
+    })
+    console.log(userEnrolledCourses)
+    // Student view - show enrolled courses
+    const plainCourses = userEnrolledCourses.map((enrollment) => ({
+      id: enrollment.course.id,
+      title: enrollment.course.title,
+      description: enrollment.course.description,
+      price: String(enrollment.course.price),
+      instructorId: enrollment.course.instructorId,
+      createdAt: enrollment.course.createdAt,
+      updatedAt: enrollment.course.updatedAt,
+    }));
+
+    return (
+      <Container className="py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">My Learning</h1>
+          <Link href="/Courses">
+            <Button variant="outline">Browse More Courses</Button>
+          </Link>
+        </div>
+
+        {plainCourses.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">No courses yet.</p>
+            <Link href="/Courses">
+              <Button>Explore Courses</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {plainCourses.map((course: any) => (
+              <CourseCard key={course.id} course={course} userId={user.id} />
+            ))}
+          </div>
+        )}
+      </Container>
+    )
+  }
 }

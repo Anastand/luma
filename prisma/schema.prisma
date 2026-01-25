@@ -120,5 +120,5 @@ model Enrollment {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
-  @@unique([userId, courseId])
+  @@unique([userId, courseId]) // means when we do a db call for this we need to do userId_CourseId: and stuff as this is a  composite unique constraint 
 }

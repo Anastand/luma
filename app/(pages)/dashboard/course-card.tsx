@@ -48,18 +48,21 @@ export function CourseCard({
           </Link>
 
           {/* Manage course page */}
-          <Link href={`/Courses/${course.id}/manage`}>
+          {userId === course.instructorId && (<Link href={`/Courses/${course.id}/manage`}>
             <Button variant="outline">Manage</Button>
-          </Link>
+          </Link>)}
+
 
           {/* Delete course button */}
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            {isPending ? "Deleting..." : "Delete"}
-          </Button>
+          {userId === course.instructorId && (
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
+              {isPending ? "Deleting..." : "Delete"}
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
