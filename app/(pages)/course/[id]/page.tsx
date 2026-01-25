@@ -36,21 +36,21 @@ export default async function CoursePage({
     }));
   }
   return (
-    <Container className="py-12 max-w-2xl">
-      <Link href="/Courses" className="text-sm text-primary underline mb-6 block">
+    <Container className="py-6 sm:py-12 max-w-2xl">
+      <Link href="/Courses" className="text-sm text-primary underline mb-4 sm:mb-6 block">
         ← Back to Courses
       </Link>
 
-      <h1 className="text-4xl font-bold">{course.title}</h1>
-      <p className="text-muted-foreground mt-2">
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{course.title}</h1>
+      <p className="text-muted-foreground mt-2 text-sm sm:text-base">
         by {course.instructor.name || course.instructor.email}
       </p>
-      <p className="mt-4 text-neutral-600 dark:text-neutral-400">
+      <p className="mt-4 text-neutral-600 dark:text-neutral-400 text-sm sm:text-base">
         {course.description || "No description provided"}
       </p>
 
-      <div className="mt-8 p-6 bg-card rounded-lg border">
-        <p className="text-3xl font-bold">${course.price.toString()}</p>
+      <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-card rounded-lg border">
+        <p className="text-2xl sm:text-3xl font-bold">${course.price.toString()}</p>
 
         {isOwner ? (
           <Link href={`/course/${id}/view`}>

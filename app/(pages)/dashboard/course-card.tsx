@@ -39,7 +39,7 @@ export function CourseCard({
         </p>
 
         {/* Action buttons: View, Manage, Delete */}
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {/* View course page */}
           <Link href={`/course/${course.id}`} className="flex-1">
             <Button
@@ -51,10 +51,11 @@ export function CourseCard({
           </Link>
 
           {/* Manage course page */}
-          {userId === course.instructorId && (<Link href={`/Courses/${course.id}/manage`}>
-            <Button variant="outline">Manage</Button>
-          </Link>)}
-
+          {userId === course.instructorId && (
+            <Link href={`/Courses/${course.id}/manage`} className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full sm:w-auto">Manage</Button>
+            </Link>
+          )}
 
           {/* Delete course button */}
           {userId === course.instructorId && (
@@ -62,6 +63,7 @@ export function CourseCard({
               variant="destructive"
               onClick={handleDelete}
               disabled={isPending}
+              className="w-full sm:w-auto"
             >
               {isPending ? "Deleting..." : "Delete"}
             </Button>
