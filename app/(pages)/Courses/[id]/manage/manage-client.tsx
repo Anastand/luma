@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 // Actions for updating/creating/removing courses, chapters, and lessons (server-side)
 import {
@@ -106,10 +107,10 @@ export function ManageChaptersClient({
           description: course.description,
           price: parseFloat(course.price),
         });
-        alert("Course saved successfully!");
+        toast.success("Course saved successfully!");
         router.push("/dashboard"); // Redirect to dashboard (fresh data)
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
+        toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };
@@ -117,19 +118,19 @@ export function ManageChaptersClient({
   // ADD A CHAPTER (triggered from UI). Validates then calls action
   const handleAddChapter = async () => {
     if (!newChapterTitle.trim()) {
-      alert("Chapter title required");
+      toast.error("Chapter title required");
       return;
     }
     startTransition(async () => {
       try {
         await createChapter(course.id, userId, newChapterTitle);
-        alert("Chapter added!");
+        toast.success("Chapter added!");
         router.refresh(); // Reload this page with new chapters
         setNewChapterTitle("");
         setAddingChapter(false);
         window.location.reload(); // Hard reload page = fresh server render
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
+        toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };
@@ -140,9 +141,10 @@ export function ManageChaptersClient({
     startTransition(async () => {
       try {
         await deleteChapter(chapterId, userId);
+        toast.success("Chapter deleted");
         router.refresh();
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
+        toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };
@@ -150,7 +152,7 @@ export function ManageChaptersClient({
   // Add a lesson to a chapter. Shows add lesson form, validates, and syncs
   const handleAddLesson = async (chapterId: string) => {
     if (!newLesson.title.trim() || !newLesson.youtubeVideoId.trim()) {
-      alert("Lesson title and YouTube ID required");
+      toast.error("Lesson title and YouTube ID required");
       return;
     }
     startTransition(async () => {
@@ -160,12 +162,12 @@ export function ManageChaptersClient({
           youtubeVideoId: newLesson.youtubeVideoId,
           description: newLesson.description || null,
         });
-        alert("Lesson added!");
+        toast.success("Lesson added!");
         setNewLesson({ title: "", youtubeVideoId: "", description: "" });
         setAddingLessonTo(null);
         window.location.reload(); // Hard reload = fresh data
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
+        toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };
@@ -175,9 +177,10 @@ export function ManageChaptersClient({
     startTransition(async () => {
       try {
         await deleteLesson(lessonId, userId);
+        toast.success("Lesson deleted");
         router.refresh();
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : "Unknown"));
+        toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
     });
   };

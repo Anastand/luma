@@ -9,6 +9,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import prisma from "@/lib/db/prisma";
 
 export default async function Onboarding() {
   const user = await currentUser();
@@ -17,10 +18,25 @@ export default async function Onboarding() {
     redirect("/sign-in");
   }
 
-  const role = user.publicMetadata.role as string | undefined;
+  // Check if user already has a role in Clerk metadata
+  const clerkRole = user.publicMetadata?.role as string | undefined;
 
-  if (role) {
-    redirect("/Courses"); // already has role → skip onboarding
+  // Also check database (more reliable)
+  let dbRole: string | undefined;
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId: user.id },
+      select: { role: true },
+    });
+    dbRole = dbUser?.role;
+  } catch {
+    // If DB fails, rely on Clerk metadata
+    dbRole = undefined;
+  }
+
+  // If user has role in either Clerk or DB, they're already onboarded
+  if (clerkRole || dbRole) {
+    redirect("/dashboard");
   }
 
   // If we reach here → logged in, but no role yet → show picker
