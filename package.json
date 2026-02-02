@@ -7,7 +7,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint",
-    "flush":"rm -rf .next node_modules/.prisma && pnpm prisma generate"
+    "flush": "rm -rf .next node_modules/.prisma && pnpm prisma generate"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -26,6 +26,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "shadcn": "^3.6.3",
+    "sonner": "^2.0.7",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7"

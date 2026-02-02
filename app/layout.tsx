@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "./providers/themeProvider";
 import { Navbar } from "../components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ToastProvider } from "@/components/toast-provider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({
           <ThemeProvider>
             <Navbar />
             <main>{children}</main>
+            <ToastProvider />
           </ThemeProvider>
         </body>
       </html>
