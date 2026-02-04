@@ -34,8 +34,6 @@ LUMA is a minimal viable marketplace for instructors to create and sell courses.
 
 ### **Critical Path**
 - [ ] **Webhook Hardening:** Re-enable Stripe HMAC signature verification (currently bypassed for rapid deployment).
-- [ ] **Environment Isolation:** Move to dedicated production/development branches in Neon to prevent test data pollution.
-- [ ] **Strict Typing:** Refactor `any` declarations into auto-generated Prisma types for full compile-time safety.
 
 ### **UX & Refinement**
 - [ ] **Consolidated UI:** Merge `/create` and `/manage` flows into a single unified instructor dashboard.
