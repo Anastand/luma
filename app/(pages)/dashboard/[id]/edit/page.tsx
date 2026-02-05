@@ -37,77 +37,83 @@ export default async function EditCoursePage({
 
   return (
     <Container className="flex flex-col items-center justify-center min-h-screen py-12">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-lg space-y-8">
         {/* Back button */}
-        <Link href="/dashboard" className="text-sm text-primary underline mb-4 block">
+        <Link href="/dashboard" className="text-sm text-primary/80 hover:text-primary transition-colors mb-4 block">
           ← Back to Dashboard
         </Link>
 
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Edit Course</h2>
+          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-2">
+            Course settings
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">Edit Course</h2>
         </div>
 
         {/* Form */}
-        <form
-          action={async (formData) => {
-            "use server";
+        <div className="rounded-3xl border border-border/70 bg-card/80 p-6 sm:p-8 shadow-lg">
+          <form
+            action={async (formData) => {
+              "use server";
 
-            // Get form values
-            const title = (formData.get("title") as string)?.trim();
-            const description = (formData.get("description") as string)?.trim() || null;
-            const price = Number(formData.get("price") || 0);
+              // Get form values
+              const title = (formData.get("title") as string)?.trim();
+              const description = (formData.get("description") as string)?.trim() || null;
+              const price = Number(formData.get("price") || 0);
 
-            // Validate
-            if (!title) throw new Error("Title required");
+              // Validate
+              if (!title) throw new Error("Title required");
 
-            // Call updateCourse from actions.ts
-            await updateCourse(id, user.id, { title, description, price });
-          }}
-          className="space-y-4"
-        >
-          {/* Title field */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              name="title"
-              defaultValue={course.title}  // ← Pre-fill with current title
-              required
-            />
-          </div>
+              // Call updateCourse from actions.ts
+              await updateCourse(id, user.id, { title, description, price });
+            }}
+            className="space-y-5"
+          >
+            {/* Title field */}
+            <div className="space-y-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                name="title"
+                defaultValue={course.title}  // ← Pre-fill with current title
+                required
+              />
+            </div>
 
-          {/* Description field */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              defaultValue={course.description || ""}  // ← Pre-fill
-              rows={4}
-              required
-            />
-          </div>
+            {/* Description field */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                defaultValue={course.description || ""}  // ← Pre-fill
+                rows={4}
+                required
+              />
+            </div>
 
-          {/* Price field */}
-          <div className="space-y-2">
-            <Label htmlFor="price">Price (USD)</Label>
-            <Input
-              id="price"
-              name="price"
-              type="number"
-              min="0"
-              max="1000000"
-              step="0.10"
-              defaultValue={course.price.toString()}
-              required
-            />
-          </div>
+            {/* Price field */}
+            <div className="space-y-2">
+              <Label htmlFor="price">Price (USD)</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                min="0"
+                max="1000000"
+                step="0.10"
+                defaultValue={course.price.toString()}
+                required
+              />
+              <p className="text-xs text-muted-foreground">Adjust pricing carefully—updates apply immediately.</p>
+            </div>
 
-          {/* Submit button */}
-          <Button type="submit" className="w-full">
-            Update Course
-          </Button>
-        </form>
+            {/* Submit button */}
+            <Button type="submit" className="w-full">
+              Update Course
+            </Button>
+          </form>
+        </div>
       </div>
     </Container>
   );

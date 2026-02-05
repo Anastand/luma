@@ -41,10 +41,10 @@ export default async function Onboarding() {
 
   // If we reach here → logged in, but no role yet → show picker
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Card className="w-full max-w-lg border-border/70 bg-card/80">
         <CardHeader>
-          <CardTitle>Choose your role</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Choose your role</CardTitle>
           <CardDescription>This cannot be changed later.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

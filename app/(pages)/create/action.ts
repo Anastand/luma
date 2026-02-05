@@ -4,6 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/db/prisma";
 import { stripe } from "@/lib/stripe";
+import { revalidateTag } from "next/cache";
 
 export async function createCourse(formData: FormData) {
   const user = await currentUser();
@@ -62,7 +63,7 @@ export async function createCourse(formData: FormData) {
     }
   }
 
-  await prisma.course.create({
+  const course = await prisma.course.create({
     data: {
       title,
       description,
@@ -72,6 +73,9 @@ export async function createCourse(formData: FormData) {
       stripePriceId,
     },
   });
+
+  revalidateTag("course:list", "max");
+  revalidateTag(`course:${course.id}`, "max");
 
   redirect("/dashboard");
 }

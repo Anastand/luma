@@ -1,6 +1,6 @@
 "use server";
 import prisma from "@/lib/db/prisma";
-import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 // ===== COURSE ACTIONS =====
 export async function updateCourse(
@@ -34,6 +34,8 @@ export async function updateCourse(
     },
   });
 
+  revalidateTag("course:list", "max");
+  revalidateTag(`course:${courseId}`, "max");
   console.log("Course updated successfully");
 }
 
@@ -62,13 +64,16 @@ export async function createChapter(
   });
 
   // Create new chapter
-  await prisma.chapter.create({
+  const chapter = await prisma.chapter.create({
     data: {
       title: title.trim(),
       courseId,
       order: chapterCount + 1,
     },
   });
+
+  revalidateTag(`course:${courseId}`, "max");
+  return chapter;
 }
 
 export async function updateChapter(
@@ -90,10 +95,13 @@ export async function updateChapter(
   if (!title?.trim()) throw new Error("Chapter title required");
 
   // Update chapter title
-  await prisma.chapter.update({
+  const updated = await prisma.chapter.update({
     where: { id: chapterId },
     data: { title: title.trim() },
   });
+
+  revalidateTag(`course:${chapter.courseId}`, "max");
+  return updated;
 }
 
 export async function deleteChapter(chapterId: string, userId: string) {
@@ -109,9 +117,12 @@ export async function deleteChapter(chapterId: string, userId: string) {
   }
 
   // Delete chapter
-  await prisma.chapter.delete({
+  const deleted = await prisma.chapter.delete({
     where: { id: chapterId },
   });
+
+  revalidateTag(`course:${chapter.courseId}`, "max");
+  return deleted;
 }
 
 // ===== LESSON ACTIONS =====
@@ -145,7 +156,7 @@ export async function createLesson(
   });
 
   // Create new lesson
-  await prisma.lesson.create({
+  const lesson = await prisma.lesson.create({
     data: {
       title: data.title.trim(),
       youtubeVideoId: data.youtubeVideoId.trim(),
@@ -154,6 +165,9 @@ export async function createLesson(
       order: lessonCount + 1,
     },
   });
+
+  revalidateTag(`course:${chapter.courseId}`, "max");
+  return lesson;
 }
 
 export async function updateLesson(
@@ -180,7 +194,7 @@ export async function updateLesson(
   if (!data.youtubeVideoId?.trim()) throw new Error("YouTube ID required");
 
   // Update lesson info
-  await prisma.lesson.update({
+  const updated = await prisma.lesson.update({
     where: { id: lessonId },
     data: {
       title: data.title.trim(),
@@ -188,6 +202,9 @@ export async function updateLesson(
       description: data.description?.trim() || null,
     },
   });
+
+  revalidateTag(`course:${lesson.chapter.courseId}`, "max");
+  return updated;
 }
 
 export async function deleteLesson(lessonId: string, userId: string) {
@@ -203,8 +220,10 @@ export async function deleteLesson(lessonId: string, userId: string) {
   }
 
   // Delete lesson
-  await prisma.lesson.delete({
+  const deleted = await prisma.lesson.delete({
     where: { id: lessonId },
   });
-}
 
+  revalidateTag(`course:${lesson.chapter.courseId}`, "max");
+  return deleted;
+}
