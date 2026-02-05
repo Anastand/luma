@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db/prisma";
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 // Set minimum and maximum allowed prices for a course
 const MIN_PRICE = 0;
@@ -27,6 +28,9 @@ export async function deleteCourse(courseId: string, userId: string) {
   await prisma.course.delete({
     where: { id: courseId },
   });
+
+  revalidateTag("course:list", "max");
+  revalidateTag(`course:${courseId}`, "max");
 
   // Redirect user back to dashboard after deletion
   redirect("/dashboard");
@@ -68,6 +72,9 @@ export async function updateCourse(
     where: { id: courseId },
     data,
   });
+
+  revalidateTag("course:list", "max");
+  revalidateTag(`course:${courseId}`, "max");
 
   // Redirect user back to dashboard after successful update
   redirect("/dashboard");

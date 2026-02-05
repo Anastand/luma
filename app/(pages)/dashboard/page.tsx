@@ -29,12 +29,15 @@ export default async function DashboardPage() {
     const plainCourses = serializeCourses(courses);
 
     return (
-      <Container className="py-12">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <Container className="py-10 sm:py-12">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">My Courses</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage and track your created courses
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-2">
+              Instructor dashboard
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-semibold">My Courses</h1>
+            <p className="text-muted-foreground mt-2">
+              Manage and track your created courses.
             </p>
           </div>
           <Link href="/create">
@@ -82,12 +85,15 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <Container className="py-12">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <Container className="py-10 sm:py-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">My Learning</h1>
-          <p className="text-muted-foreground mt-1">
-            Continue your learning journey
+          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-2">
+            Student dashboard
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-semibold">My Learning</h1>
+          <p className="text-muted-foreground mt-2">
+            Continue your learning journey.
           </p>
         </div>
         <Link href="/Courses">

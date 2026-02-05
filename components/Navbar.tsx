@@ -19,8 +19,8 @@ export const Navbar = () => {
   ];
 
   return (
-    <div className="border-b border-neutral-200 dark:border-neutral-800">
-      <Container className="flex justify-between items-center py-4">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/70 backdrop-blur">
+      <Container className="flex justify-between items-center py-3">
         <div className="flex items-center gap-4 lg:gap-8">
           <Logo />
           {/* Desktop Navigation */}
@@ -29,7 +29,7 @@ export const Navbar = () => {
               <Link
                 key={index}
                 href={item.href}
-                className="text-sm text-neutral-600 dark:text-neutral-400 font-medium hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
               >
                 {item.title}
               </Link>
@@ -42,10 +42,10 @@ export const Navbar = () => {
           <div className="hidden sm:flex items-center gap-3">
             <SignedOut>
               <Link href="/sign-in">
-                <Button variant="ghost" size="sm">Sign in</Button>
+                <Button variant="ghost" size="sm" className="rounded-full">Sign in</Button>
               </Link>
               <Link href="/sign-up">
-                <Button size="sm">Sign up</Button>
+                <Button size="sm" className="rounded-full px-4">Sign up</Button>
               </Link>
             </SignedOut>
             <SignedIn>
@@ -56,7 +56,7 @@ export const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-neutral-600 dark:text-neutral-400"
+            className="md:hidden p-2 text-foreground/70 hover:text-foreground transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -66,30 +66,30 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800">
+        <div className="md:hidden border-t border-border/70 bg-background/95 backdrop-blur">
           <Container className="py-4 space-y-3">
             {Nav_links.map((item, index) => (
               <Link
                 key={index}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm text-neutral-600 dark:text-neutral-400 font-medium hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors py-2"
+                className="block text-sm font-medium text-foreground/70 hover:text-foreground transition-colors py-2"
               >
                 {item.title}
               </Link>
             ))}
-            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
+            <div className="pt-4 border-t border-border/70 space-y-2">
               <SignedOut>
                 <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start">Sign in</Button>
+                  <Button variant="ghost" className="w-full justify-start rounded-full">Sign in</Button>
                 </Link>
                 <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full">Sign up</Button>
+                  <Button className="w-full rounded-full">Sign up</Button>
                 </Link>
               </SignedOut>
               <SignedIn>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-neutral-600 dark:text-neutral-400">Account:</span>
+                  <span className="text-sm text-foreground/70">Account:</span>
                   <UserButton afterSignOutUrl="/" />
                 </div>
               </SignedIn>
@@ -97,6 +97,6 @@ export const Navbar = () => {
           </Container>
         </div>
       )}
-    </div>
+    </header>
   );
 };

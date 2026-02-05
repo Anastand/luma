@@ -21,7 +21,7 @@ export function CheckoutButton({
   };
 
   return (
-    <Button onClick={handleCheckout} disabled={pending}>
+    <Button onClick={handleCheckout} disabled={pending} className="w-full">
       {pending ? "Loading..." : `Buy for $${price}`}
     </Button>
   );

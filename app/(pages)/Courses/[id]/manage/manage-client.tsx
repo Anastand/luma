@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 // Actions for updating/creating/removing courses, chapters, and lessons (server-side)
@@ -123,12 +123,21 @@ export function ManageChaptersClient({
     }
     startTransition(async () => {
       try {
-        await createChapter(course.id, userId, newChapterTitle);
+        const created = await createChapter(course.id, userId, newChapterTitle);
         toast.success("Chapter added!");
-        router.refresh(); // Reload this page with new chapters
+        setCourse((prev) => ({
+          ...prev,
+          chapters: [
+            ...prev.chapters,
+            {
+              ...created,
+              lessons: [],
+            },
+          ].sort((a, b) => a.order - b.order),
+        }));
+        setExpandedChapters((prev) => new Set(prev).add(created.id));
         setNewChapterTitle("");
         setAddingChapter(false);
-        window.location.reload(); // Hard reload page = fresh server render
       } catch (error) {
         toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -142,7 +151,15 @@ export function ManageChaptersClient({
       try {
         await deleteChapter(chapterId, userId);
         toast.success("Chapter deleted");
-        router.refresh();
+        setCourse((prev) => ({
+          ...prev,
+          chapters: prev.chapters.filter((ch) => ch.id !== chapterId),
+        }));
+        setExpandedChapters((prev) => {
+          const next = new Set(prev);
+          next.delete(chapterId);
+          return next;
+        });
       } catch (error) {
         toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -157,15 +174,22 @@ export function ManageChaptersClient({
     }
     startTransition(async () => {
       try {
-        await createLesson(chapterId, userId, {
+        const created = await createLesson(chapterId, userId, {
           title: newLesson.title,
           youtubeVideoId: newLesson.youtubeVideoId,
           description: newLesson.description || null,
         });
         toast.success("Lesson added!");
+        setCourse((prev) => ({
+          ...prev,
+          chapters: prev.chapters.map((ch) =>
+            ch.id === chapterId
+              ? { ...ch, lessons: [...ch.lessons, created].sort((a, b) => a.order - b.order) }
+              : ch
+          ),
+        }));
         setNewLesson({ title: "", youtubeVideoId: "", description: "" });
         setAddingLessonTo(null);
-        window.location.reload(); // Hard reload = fresh data
       } catch (error) {
         toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -178,7 +202,13 @@ export function ManageChaptersClient({
       try {
         await deleteLesson(lessonId, userId);
         toast.success("Lesson deleted");
-        router.refresh();
+        setCourse((prev) => ({
+          ...prev,
+          chapters: prev.chapters.map((ch) => ({
+            ...ch,
+            lessons: ch.lessons.filter((lesson) => lesson.id !== lessonId),
+          })),
+        }));
       } catch (error) {
         toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
       }
@@ -197,6 +227,7 @@ export function ManageChaptersClient({
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Course Information</CardTitle>
+          <CardDescription>Set the essentials students will see first.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpdateCourse} className="space-y-4">
@@ -261,6 +292,7 @@ export function ManageChaptersClient({
       <Card>
         <CardHeader>
           <CardTitle>Manage Chapters</CardTitle>
+          <CardDescription>Organize lessons into a clear path.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* If no chapters, show message */}
@@ -272,7 +304,7 @@ export function ManageChaptersClient({
             <div className="space-y-3">
               {/* For each chapter: */}
               {course.chapters.map((chapter) => (
-                <div key={chapter.id} className="border rounded-lg p-4 space-y-3">
+                <div key={chapter.id} className="border border-border/70 rounded-2xl p-4 space-y-3 bg-card/70">
                   {/* Chapter header: Title, Expand/Collapse, Edit and Delete buttons */}
                   <div className="flex items-center justify-between">
                     <button
@@ -299,9 +331,20 @@ export function ManageChaptersClient({
                           );
                           if (newTitle) {
                             // Edits use server action and on success, page refreshes
-                            startTransition(() =>
-                              updateChapter(chapter.id, userId, newTitle)
-                            );
+                            startTransition(async () => {
+                              try {
+                                const updated = await updateChapter(chapter.id, userId, newTitle);
+                                setCourse((prev) => ({
+                                  ...prev,
+                                  chapters: prev.chapters.map((ch) =>
+                                    ch.id === updated.id ? { ...ch, title: updated.title } : ch
+                                  ),
+                                }));
+                                toast.success("Chapter updated");
+                              } catch (error) {
+                                toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
+                              }
+                            });
                           }
                         }}
                         disabled={isPending}
@@ -331,9 +374,9 @@ export function ManageChaptersClient({
                         <div className="space-y-2">
                           {/* Show each lesson in this chapter */}
                           {chapter.lessons.map((lesson) => (
-                            <div
+                    <div
                               key={lesson.id}
-                              className="flex items-center justify-between p-2 bg-muted rounded"
+                              className="flex items-center justify-between p-3 bg-muted/60 rounded-xl border border-border/60"
                             >
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
@@ -356,14 +399,27 @@ export function ManageChaptersClient({
                                       lesson.title
                                     );
                                     if (newTitle) {
-                                      startTransition(() =>
-                                        updateLesson(lesson.id, userId, {
-                                          title: newTitle,
-                                          youtubeVideoId:
-                                            lesson.youtubeVideoId || "",
-                                          description: lesson.description,
-                                        })
-                                      );
+                                      startTransition(async () => {
+                                        try {
+                                          const updated = await updateLesson(lesson.id, userId, {
+                                            title: newTitle,
+                                            youtubeVideoId: lesson.youtubeVideoId || "",
+                                            description: lesson.description,
+                                          });
+                                          setCourse((prev) => ({
+                                            ...prev,
+                                            chapters: prev.chapters.map((ch) => ({
+                                              ...ch,
+                                              lessons: ch.lessons.map((l) =>
+                                                l.id === updated.id ? { ...l, title: updated.title } : l
+                                              ),
+                                            })),
+                                          }));
+                                          toast.success("Lesson updated");
+                                        } catch (error) {
+                                          toast.error("Error: " + (error instanceof Error ? error.message : "Unknown"));
+                                        }
+                                      });
                                     }
                                   }}
                                   disabled={isPending}

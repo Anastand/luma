@@ -7,7 +7,7 @@ export const Logo = ({ className }: { className?: string }) => {
     <Link href="/" className={cn("flex items-center gap-2", className)}>
       {/* Added gap-2 for better spacing */}
       <LOGO_ICON className="w-8 h-8" /> {/* Default size */}
-      <span className="text-lg font-medium text-neutral-600 dark:text-neutral-400">
+      <span className="text-lg font-semibold tracking-tight text-foreground/80">
         Luma
       </span>
       {/* Added font-semibold + dark mode text support */}

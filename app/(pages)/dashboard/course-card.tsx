@@ -7,6 +7,7 @@ import { useTransition } from "react";
 import { deleteCourse } from "./actions";
 import type { SerializedCourse } from "@/types";
 import { toast } from "sonner";
+import { BookOpen } from "lucide-react";
 
 // Card component for displaying a single course with manage/delete options
 export function CourseCard({
@@ -42,10 +43,12 @@ export function CourseCard({
     : `$${course.price}`;
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300">
+    <Card className="group overflow-hidden border border-border/70 bg-card/80 hover:shadow-lg transition-all duration-300">
       {/* Course thumbnail placeholder */}
-      <div className="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-        <span className="text-4xl">📚</span>
+      <div className="h-40 bg-gradient-to-br from-primary/15 via-background to-background flex items-center justify-center">
+        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <BookOpen className="text-primary w-6 h-6" />
+        </div>
       </div>
       
       <CardHeader className="pb-2">

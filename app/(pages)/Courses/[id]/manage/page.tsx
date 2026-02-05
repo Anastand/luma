@@ -51,8 +51,17 @@ export default async function ManageCoursePage({
   };
 
   return (
-    <Container className="py-12">
-      <div className="max-w-4xl mx-auto">
+    <Container className="py-10 sm:py-12">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-2">
+            Course builder
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-semibold">{course.title}</h1>
+          <p className="text-muted-foreground mt-2">
+            Structure chapters and lessons with precision.
+          </p>
+        </div>
         <ManageChaptersClient course={courseData} userId={user.id} />
       </div>
     </Container>
